@@ -4,6 +4,16 @@ using UnityEngine;
 
 public class BoardManager : MonoBehaviour {
 
+	#region Singleton
+
+	public static BoardManager Instance{ set; get; }
+
+	void Awake () {
+		Instance = this;
+	}
+
+	#endregion
+
 	public ChessPiece[,] ChessPieces{ get; set; }
 
 	public List<GameObject> chessPiecePrefabs;
@@ -13,6 +23,8 @@ public class BoardManager : MonoBehaviour {
 	List<GameObject> activeChessPieces;
 
 	ChessPiece selectedChesspiece;
+
+	bool[,] AllowedMoves{ set; get; }
 
 	const float tile_Size = 1f;
 	const float tile_Offset = .5f;
@@ -48,17 +60,27 @@ public class BoardManager : MonoBehaviour {
 			return;
 		}
 
+		AllowedMoves = ChessPieces [x, y].PossibleMove ();
 		selectedChesspiece = ChessPieces [x, y];
+		BoardHighlight.Instance.HighlightAllowedMoves (AllowedMoves);
 	}
 
 	void MoveChessPiece (int x, int y) {
-		if (selectedChesspiece.PossibleMove (x, y)) {
+		if (AllowedMoves [x, y]) {
+			ChessPiece c = ChessPieces [x, y];
+			if (c != null && c.isWhite != isWhiteTurn) {
+				activeChessPieces.Remove (c.gameObject);
+				Destroy (c.gameObject);
+			}
+
 			ChessPieces [selectedChesspiece.CurrentX, selectedChesspiece.CurrentY] = null;
 			selectedChesspiece.transform.position = GetTileCentre (x, y);
+			selectedChesspiece.SetPosition (x, y);
 			ChessPieces [x, y] = selectedChesspiece;
 			isWhiteTurn = !isWhiteTurn;
 		}
 
+		BoardHighlight.Instance.HideHighlights ();
 		selectedChesspiece = null;
 	}
 

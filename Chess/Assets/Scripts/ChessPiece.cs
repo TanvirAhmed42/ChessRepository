@@ -13,7 +13,7 @@ public abstract class ChessPiece : MonoBehaviour {
 		CurrentY = y;
 	}
 
-	public virtual bool PossibleMove (int x, int y) {
-		return true;
+	public virtual bool[,] PossibleMove () {
+		return new bool[8, 8];
 	}
 }
