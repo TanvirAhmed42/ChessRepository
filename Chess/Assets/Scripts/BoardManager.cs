@@ -4,9 +4,15 @@ using UnityEngine;
 
 public class BoardManager : MonoBehaviour {
 
+	public ChessPiece[,] ChessPieces{ get; set; }
+
 	public List<GameObject> chessPiecePrefabs;
 
-	List<GameObject> activeChessPieces = new List<GameObject> ();
+	public bool isWhiteTurn = true;
+
+	List<GameObject> activeChessPieces;
+
+	ChessPiece selectedChesspiece;
 
 	const float tile_Size = 1f;
 	const float tile_Offset = .5f;
@@ -21,6 +27,39 @@ public class BoardManager : MonoBehaviour {
 	void Update () {
 		UpdateSelection ();
 		DrawChessBoard ();
+
+		if (Input.GetMouseButtonDown (0)) {
+			if (selectionX >= 0 && selectionY >= 0) {
+				if (selectedChesspiece == null) {
+					SelectChessPiece (selectionX, selectionY);
+				} else {
+					MoveChessPiece (selectionX, selectionY);
+				}
+			}
+		}
+	}
+
+	void SelectChessPiece (int x, int y) {
+		if (ChessPieces [x, y] == null) {
+			return;
+		}
+
+		if (ChessPieces [x, y].isWhite != isWhiteTurn) {
+			return;
+		}
+
+		selectedChesspiece = ChessPieces [x, y];
+	}
+
+	void MoveChessPiece (int x, int y) {
+		if (selectedChesspiece.PossibleMove (x, y)) {
+			ChessPieces [selectedChesspiece.CurrentX, selectedChesspiece.CurrentY] = null;
+			selectedChesspiece.transform.position = GetTileCentre (x, y);
+			ChessPieces [x, y] = selectedChesspiece;
+			isWhiteTurn = !isWhiteTurn;
+		}
+
+		selectedChesspiece = null;
 	}
 
 	void UpdateSelection () {
@@ -41,61 +80,66 @@ public class BoardManager : MonoBehaviour {
 		
 	}
 
-	void SpawnChessPieces (int index, Vector3 position) {
-		GameObject chessPieceToSpawn = Instantiate (chessPiecePrefabs [index], position, Quaternion.Euler (Vector3.right * 90)) as GameObject;
+	void SpawnChessPieces (int index, int x, int y) {
+		GameObject chessPieceToSpawn = Instantiate (chessPiecePrefabs [index], GetTileCentre (x, y), Quaternion.Euler (Vector3.right * 90)) as GameObject;
 		chessPieceToSpawn.transform.SetParent (transform);
+		ChessPieces [x, y] = chessPieceToSpawn.GetComponent<ChessPiece> ();
+		ChessPieces [x, y].SetPosition (x, y);
 		activeChessPieces.Add (chessPieceToSpawn);
 	}
 
 	void SpawnAllChessPieces () {
+		activeChessPieces = new List<GameObject> ();
+		ChessPieces = new ChessPiece[8, 8];
+
 		//White
 
 		//Rooks
-		SpawnChessPieces(2, GetTileCentre(0, 0));
-		SpawnChessPieces (2, GetTileCentre (7, 0));
+		SpawnChessPieces(2, 0, 0);
+		SpawnChessPieces (2, 7, 0);
 
 		//Knights
-		SpawnChessPieces(4, GetTileCentre(1, 0));
-		SpawnChessPieces (4, GetTileCentre (6, 0));
+		SpawnChessPieces(4, 1, 0);
+		SpawnChessPieces (4, 6, 0);
 
 		//Bishops
-		SpawnChessPieces(3, GetTileCentre(2, 0));
-		SpawnChessPieces (3, GetTileCentre (5, 0));
+		SpawnChessPieces(3, 2, 0);
+		SpawnChessPieces (3, 5, 0);
 
 		//Queen
-		SpawnChessPieces(1, GetTileCentre(3, 0));
+		SpawnChessPieces(1, 3, 0);
 
 		//King
-		SpawnChessPieces(0, GetTileCentre(4, 0));
+		SpawnChessPieces(0, 4, 0);
 
 		//Pawns
 		for (int i = 0; i < 8; i++) {
-			SpawnChessPieces (5, GetTileCentre (i, 1));
+			SpawnChessPieces (5, i, 1);
 		}
 
 		//Black
 
 		//Rooks
-		SpawnChessPieces(8, GetTileCentre(0, 7));
-		SpawnChessPieces (8, GetTileCentre (7, 7));
+		SpawnChessPieces(8, 0, 7);
+		SpawnChessPieces (8, 7, 7);
 
 		//Knights
-		SpawnChessPieces(10, GetTileCentre(1, 7));
-		SpawnChessPieces (10, GetTileCentre (6, 7));
+		SpawnChessPieces(10, 1, 7);
+		SpawnChessPieces (10, 6, 7);
 
 		//Bishops
-		SpawnChessPieces(9, GetTileCentre(2, 7));
-		SpawnChessPieces (9, GetTileCentre (5, 7));
+		SpawnChessPieces(9, 2, 7);
+		SpawnChessPieces (9, 5, 7);
 
 		//Queen
-		SpawnChessPieces(7, GetTileCentre(3, 7));
+		SpawnChessPieces(7, 3, 7);
 
 		//King
-		SpawnChessPieces(6, GetTileCentre(4, 7));
+		SpawnChessPieces(6, 4, 7);
 
 		//Pawns
 		for (int i = 0; i < 8; i++) {
-			SpawnChessPieces (11, GetTileCentre (i, 6));
+			SpawnChessPieces (11, i, 6);
 		}
 	}
 
