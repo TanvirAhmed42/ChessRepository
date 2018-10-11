@@ -20,6 +20,8 @@ public class BoardManager : MonoBehaviour {
 
 	public bool isWhiteTurn = true;
 
+	public int[] EnPassant{ get; set; }
+
 	List<GameObject> activeChessPieces;
 
 	ChessPiece selectedChesspiece;
@@ -86,6 +88,42 @@ public class BoardManager : MonoBehaviour {
 				Destroy (c.gameObject);
 			}
 
+			if (selectedChesspiece.GetType () == typeof(Pawn)) {
+				if (y == 7) {
+					activeChessPieces.Remove (selectedChesspiece.gameObject);
+					Destroy (selectedChesspiece.gameObject);
+					SpawnChessPieces (1, x, y);
+					selectedChesspiece = ChessPieces [x, y];
+				} else if (y == 0) {
+					activeChessPieces.Remove (selectedChesspiece.gameObject);
+					Destroy (selectedChesspiece.gameObject);
+					SpawnChessPieces (7, x, y);
+					selectedChesspiece = ChessPieces [x, y];
+				}
+
+				if (x == EnPassant [0] && y == EnPassant [1]) {
+					if (y == 5) {
+						c = ChessPieces [x, y - 1];
+					} else {
+						c = ChessPieces [x, y + 1];
+					}
+
+					activeChessPieces.Remove (c.gameObject);
+					Destroy (c.gameObject);
+				}
+
+				EnPassant [0] = -1;
+				EnPassant [1] = -1;
+
+				if (selectedChesspiece.CurrentY == 1 && y == 3) {
+					EnPassant [0] = x;
+					EnPassant [1] = y - 1;
+				} else if (selectedChesspiece.CurrentY == 6 && y == 4) {
+					EnPassant [0] = x;
+					EnPassant [1] = y + 1;
+				}
+			}
+
 			ChessPieces [selectedChesspiece.CurrentX, selectedChesspiece.CurrentY] = null;
 			selectedChesspiece.transform.position = GetTileCentre (x, y);
 			selectedChesspiece.SetPosition (x, y);
@@ -126,6 +164,7 @@ public class BoardManager : MonoBehaviour {
 	void SpawnAllChessPieces () {
 		activeChessPieces = new List<GameObject> ();
 		ChessPieces = new ChessPiece[8, 8];
+		EnPassant = new int[2]{ -1, -1 };
 
 		//White
 
