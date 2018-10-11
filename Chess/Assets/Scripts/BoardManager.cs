@@ -60,7 +60,20 @@ public class BoardManager : MonoBehaviour {
 			return;
 		}
 
+		bool hasAtLeastOneMove = false;
 		AllowedMoves = ChessPieces [x, y].PossibleMove ();
+		for (int i = 0; i < 8; i++) {
+			for (int j = 0; j < 8; j++) {
+				if (AllowedMoves [i, j]) {
+					hasAtLeastOneMove = true;
+					break;
+				}
+			}
+		}
+
+		if (!hasAtLeastOneMove)
+			return;
+
 		selectedChesspiece = ChessPieces [x, y];
 		BoardHighlight.Instance.HighlightAllowedMoves (AllowedMoves);
 	}
