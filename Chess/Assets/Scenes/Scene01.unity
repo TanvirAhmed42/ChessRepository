@@ -248,7 +248,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: -1
+  m_SortingOrder: -2
   m_Sprite: {fileID: 21300000, guid: 42a1ee25381b907469064bf1ba8ded87, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -486,5 +486,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f7fb64d03887fd94e88db45606b24c36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  highlightPrefab: {fileID: 1977786918992734, guid: 7be63d95ed83da946845cd7073e8bcc7,
+  highlightPrefab: {fileID: 1417359941938744, guid: 7be63d95ed83da946845cd7073e8bcc7,
     type: 2}

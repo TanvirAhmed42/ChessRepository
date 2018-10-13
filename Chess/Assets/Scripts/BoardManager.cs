@@ -15,10 +15,16 @@ public class BoardManager : MonoBehaviour {
 	#endregion
 
 	public ChessPiece[,] ChessPieces{ get; set; }
+	[HideInInspector]
+	public List<ChessPiece> allWhitePieces;
+	[HideInInspector]
+	public List<ChessPiece> allBlackPieces;
 
 	public List<GameObject> chessPiecePrefabs;
 
-	public bool isWhiteTurn = true;
+	public static bool isWhiteTurn = true;
+	public bool isBlackChecked;
+	public bool isWhiteChecked;
 
 	public int[] EnPassant{ get; set; }
 
@@ -80,59 +86,131 @@ public class BoardManager : MonoBehaviour {
 		BoardHighlight.Instance.HighlightAllowedMoves (AllowedMoves);
 	}
 
+	void CapturePiece (ChessPiece c) {
+		activeChessPieces.Remove (c.gameObject);
+		if (c.isWhite) {
+			allWhitePieces.Remove (c);
+		} else {
+			allBlackPieces.Remove (c);
+		}
+		Destroy (c.gameObject);
+	}
+
 	void MoveChessPiece (int x, int y) {
 		if (AllowedMoves [x, y]) {
-			ChessPiece c = ChessPieces [x, y];
-			if (c != null && c.isWhite != isWhiteTurn) {
-				activeChessPieces.Remove (c.gameObject);
-				Destroy (c.gameObject);
+			Vector2 lastPosition = new Vector2 (selectedChesspiece.CurrentX, selectedChesspiece.CurrentY);
+			ChessPiece previousPiece = ChessPieces [x, y];
+			bool noCheck = false;
+			MoveInGame (x, y);
+			if (selectedChesspiece.isWhite) {
+				CalculateWhiteCheck ();
+
+				if (isWhiteChecked) {
+					RevertInGame ((int)lastPosition.x, (int)lastPosition.y, x, y, previousPiece);
+				} else {
+					noCheck = true;
+					RevertInGame ((int)lastPosition.x, (int)lastPosition.y, x, y, previousPiece);
+				}
+			} else {
+				CalculateBlackCheck ();
+
+				if (isBlackChecked) {
+					RevertInGame ((int)lastPosition.x, (int)lastPosition.y, x, y, previousPiece);
+				} else {
+					noCheck = true;
+					RevertInGame ((int)lastPosition.x, (int)lastPosition.y, x, y, previousPiece);
+				}
 			}
 
-			if (selectedChesspiece.GetType () == typeof(Pawn)) {
-				if (y == 7) {
-					activeChessPieces.Remove (selectedChesspiece.gameObject);
-					Destroy (selectedChesspiece.gameObject);
-					SpawnChessPieces (1, x, y);
-					selectedChesspiece = ChessPieces [x, y];
-				} else if (y == 0) {
-					activeChessPieces.Remove (selectedChesspiece.gameObject);
-					Destroy (selectedChesspiece.gameObject);
-					SpawnChessPieces (7, x, y);
-					selectedChesspiece = ChessPieces [x, y];
+			if (noCheck) {
+				if (previousPiece != null && previousPiece.isWhite != isWhiteTurn) {
+					CapturePiece (previousPiece);
 				}
-
-				if (x == EnPassant [0] && y == EnPassant [1]) {
-					if (y == 5) {
-						c = ChessPieces [x, y - 1];
-					} else {
-						c = ChessPieces [x, y + 1];
+				if (selectedChesspiece.GetType () == typeof(Pawn)) {
+					if (y == 7) {
+						// White Promotion
+						CapturePiece (selectedChesspiece);
+						SpawnChessPieces (1, x, y);
+						selectedChesspiece = ChessPieces [x, y];
+					} else if (y == 0) {
+						// Black Promotion
+						CapturePiece (selectedChesspiece);
+						SpawnChessPieces (7, x, y);
+						selectedChesspiece = ChessPieces [x, y];
 					}
 
-					activeChessPieces.Remove (c.gameObject);
-					Destroy (c.gameObject);
+					if (x == EnPassant [0] && y == EnPassant [1]) {
+						if (y == 5 && isWhiteTurn) {
+							previousPiece = ChessPieces [x, y - 1];
+						} else if (y == 2 && !isWhiteTurn) {
+							previousPiece = ChessPieces [x, y + 1];
+						}
+
+						CapturePiece (previousPiece);
+					}
 				}
 
 				EnPassant [0] = -1;
 				EnPassant [1] = -1;
 
-				if (selectedChesspiece.CurrentY == 1 && y == 3) {
-					EnPassant [0] = x;
-					EnPassant [1] = y - 1;
-				} else if (selectedChesspiece.CurrentY == 6 && y == 4) {
-					EnPassant [0] = x;
-					EnPassant [1] = y + 1;
+				if (selectedChesspiece.GetType () == typeof(Pawn)) {
+					if (selectedChesspiece.CurrentY == 1 && y == 3) {
+						//Black gets Enpassant
+						EnPassant [0] = x;
+						EnPassant [1] = y - 1;
+					} else if (selectedChesspiece.CurrentY == 6 && y == 4) {
+						//Black Gets EnPassant
+						EnPassant [0] = x;
+						EnPassant [1] = y + 1;
+					}
 				}
-			}
 
-			ChessPieces [selectedChesspiece.CurrentX, selectedChesspiece.CurrentY] = null;
-			selectedChesspiece.transform.position = GetTileCentre (x, y);
-			selectedChesspiece.SetPosition (x, y);
-			ChessPieces [x, y] = selectedChesspiece;
-			isWhiteTurn = !isWhiteTurn;
+				MoveInGame (x, y);
+				MovePhysical (x, y);
+			}
 		}
 
 		BoardHighlight.Instance.HideHighlights ();
 		selectedChesspiece = null;
+	}
+
+	void MoveInGame (int x, int y) {
+		ChessPieces [selectedChesspiece.CurrentX, selectedChesspiece.CurrentY] = null;
+		selectedChesspiece.SetPosition (x, y);
+		ChessPieces [x, y] = selectedChesspiece;
+	}
+
+	void MovePhysical (int x, int y) {
+		selectedChesspiece.transform.position = GetTileCentre (x, y);
+		isWhiteTurn = !isWhiteTurn;
+	}
+
+	void RevertInGame (int lastX, int lastY, int x, int y, ChessPiece previousPiece) {
+		ChessPieces [lastX, lastY] = selectedChesspiece;
+		selectedChesspiece.SetPosition (lastX, lastY);
+		ChessPieces [x, y] = previousPiece;
+	}
+
+	void CalculateBlackCheck () {
+		isBlackChecked = false;
+		foreach (ChessPiece c in allWhitePieces) {
+			c.PossibleMove ();
+			if (c.checkKing) {
+				isBlackChecked = true;
+				break;
+			}
+		}
+	}
+
+	void CalculateWhiteCheck () {
+		isWhiteChecked = false;
+		foreach (ChessPiece c in allBlackPieces) {
+			c.PossibleMove ();
+			if (c.checkKing) {
+				isWhiteChecked = true;
+				break;
+			}
+		}
 	}
 
 	void UpdateSelection () {
@@ -159,11 +237,18 @@ public class BoardManager : MonoBehaviour {
 		ChessPieces [x, y] = chessPieceToSpawn.GetComponent<ChessPiece> ();
 		ChessPieces [x, y].SetPosition (x, y);
 		activeChessPieces.Add (chessPieceToSpawn);
+		if (ChessPieces [x, y].isWhite) {
+			allWhitePieces.Add (ChessPieces [x, y]);
+		} else {
+			allBlackPieces.Add (ChessPieces [x, y]);
+		}
 	}
 
 	void SpawnAllChessPieces () {
 		activeChessPieces = new List<GameObject> ();
 		ChessPieces = new ChessPiece[8, 8];
+		allWhitePieces = new List<ChessPiece> ();
+		allBlackPieces = new List<ChessPiece> ();
 		EnPassant = new int[2]{ -1, -1 };
 
 		//White

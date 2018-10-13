@@ -9,6 +9,7 @@ public class Queen : ChessPiece {
 		bool[,] possibleMoves = new bool[8, 8];
 		ChessPiece c = null;
 		int i, j;
+		checkKing = false;
 
 		//Right
 		i = CurrentX;
@@ -21,8 +22,12 @@ public class Queen : ChessPiece {
 			if (c == null)
 				possibleMoves [i, CurrentY] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, CurrentY] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -39,8 +44,12 @@ public class Queen : ChessPiece {
 			if (c == null)
 				possibleMoves [i, CurrentY] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, CurrentY] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -57,8 +66,12 @@ public class Queen : ChessPiece {
 			if (c == null)
 				possibleMoves [CurrentX, i] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [CurrentX, i] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -75,8 +88,12 @@ public class Queen : ChessPiece {
 			if (c == null)
 				possibleMoves [CurrentX, i] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [CurrentX, i] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -95,8 +112,12 @@ public class Queen : ChessPiece {
 			if (c == null)
 				possibleMoves [i, j] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, j] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -115,8 +136,12 @@ public class Queen : ChessPiece {
 			if (c == null)
 				possibleMoves [i, j] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, j] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -135,8 +160,12 @@ public class Queen : ChessPiece {
 			if (c == null)
 				possibleMoves [i, j] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, j] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -155,8 +184,12 @@ public class Queen : ChessPiece {
 			if (c == null)
 				possibleMoves [i, j] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, j] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}

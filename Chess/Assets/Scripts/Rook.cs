@@ -10,6 +10,7 @@ public class Rook : ChessPiece {
 
 		ChessPiece c = null;
 		int i;
+		checkKing = false;
 
 		//Right
 		i = CurrentX;
@@ -22,8 +23,12 @@ public class Rook : ChessPiece {
 			if (c == null)
 				possibleMoves [i, CurrentY] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, CurrentY] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -40,8 +45,12 @@ public class Rook : ChessPiece {
 			if (c == null)
 				possibleMoves [i, CurrentY] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, CurrentY] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -58,8 +67,12 @@ public class Rook : ChessPiece {
 			if (c == null)
 				possibleMoves [CurrentX, i] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [CurrentX, i] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -76,8 +89,12 @@ public class Rook : ChessPiece {
 			if (c == null)
 				possibleMoves [CurrentX, i] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [CurrentX, i] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}

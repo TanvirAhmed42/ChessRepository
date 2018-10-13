@@ -9,6 +9,7 @@ public class Bishop : ChessPiece {
 		bool[,] possibleMoves = new bool[8, 8];
 		ChessPiece c = null;
 		int i, j;
+		checkKing = false;
 
 		//Top Right
 		i = CurrentX;
@@ -23,8 +24,12 @@ public class Bishop : ChessPiece {
 			if (c == null)
 				possibleMoves [i, j] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, j] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -43,8 +48,12 @@ public class Bishop : ChessPiece {
 			if (c == null)
 				possibleMoves [i, j] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, j] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -63,8 +72,12 @@ public class Bishop : ChessPiece {
 			if (c == null)
 				possibleMoves [i, j] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, j] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}
@@ -83,8 +96,12 @@ public class Bishop : ChessPiece {
 			if (c == null)
 				possibleMoves [i, j] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [i, j] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 
 				break;
 			}

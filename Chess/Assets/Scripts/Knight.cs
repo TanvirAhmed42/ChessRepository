@@ -7,6 +7,7 @@ public class Knight : ChessPiece {
 	public override bool[,] PossibleMove ()
 	{
 		bool[,] possibleMoves = new bool[8, 8];
+		checkKing = false;
 
 		//Right Up
 		KnightMove(CurrentX + 2, CurrentY + 1, ref possibleMoves);
@@ -43,8 +44,12 @@ public class Knight : ChessPiece {
 			if (c == null)
 				possibleMoves [x, y] = true;
 			else {
-				if (c.isWhite != isWhite)
+				if (c.isWhite != isWhite) {
 					possibleMoves [x, y] = true;
+					if (c.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 			}
 		}
 	}

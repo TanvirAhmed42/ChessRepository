@@ -7,6 +7,7 @@ public abstract class ChessPiece : MonoBehaviour {
 	public int CurrentX{ get; set; }
 	public int CurrentY{ get; set; }
 	public bool isWhite;
+	public bool checkKing;
 
 	public void SetPosition (int x, int y) {
 		CurrentX = x;

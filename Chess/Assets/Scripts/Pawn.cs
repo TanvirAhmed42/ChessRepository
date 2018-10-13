@@ -10,28 +10,39 @@ public class Pawn : ChessPiece {
 		ChessPiece c1 = null;
 		ChessPiece c2 = null;
 		int[] enPassant = BoardManager.Instance.EnPassant;
+		checkKing = false;
 
 		//White
 
 		if (isWhite) {
 			//Diagonal Left
 			if (CurrentX != 0 && CurrentY != 7) {
-				if (enPassant [0] == CurrentX - 1 && enPassant [1] == CurrentY + 1)
+				if (enPassant [0] == CurrentX - 1 && enPassant [1] == CurrentY + 1 && BoardManager.isWhiteTurn) {
 					possibleMoves [CurrentX - 1, CurrentY + 1] = true;
+				}
 
 				c1 = BoardManager.Instance.ChessPieces [CurrentX - 1, CurrentY + 1];
-				if (c1 != null && !c1.isWhite)
+				if (c1 != null && !c1.isWhite) {
 					possibleMoves [CurrentX - 1, CurrentY + 1] = true;
+					if (c1.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 			}
 
 			//Diagonal Right
 			if (CurrentX != 7 && CurrentY != 7) {
-				if (enPassant [0] == CurrentX + 1 && enPassant [1] == CurrentY + 1)
+				if (enPassant [0] == CurrentX + 1 && enPassant [1] == CurrentY + 1 && BoardManager.isWhiteTurn) {
 					possibleMoves [CurrentX + 1, CurrentY + 1] = true;
+				}
 
 				c1 = BoardManager.Instance.ChessPieces [CurrentX + 1, CurrentY + 1];
-				if (c1 != null && !c1.isWhite)
+				if (c1 != null && !c1.isWhite) {
 					possibleMoves [CurrentX + 1, CurrentY + 1] = true;
+					if (c1.GetType () == typeof(King)) {
+						checkKing = true;
+					}
+				}
 			}
 
 			//One Move Forward
@@ -55,8 +66,9 @@ public class Pawn : ChessPiece {
 		else {
 			//Diagonal Left
 			if (CurrentX != 7 && CurrentY != 0) {
-				if (enPassant [0] == CurrentX + 1 && enPassant [1] == CurrentY - 1)
+				if (enPassant [0] == CurrentX + 1 && enPassant [1] == CurrentY - 1 && !BoardManager.isWhiteTurn) {
 					possibleMoves [CurrentX + 1, CurrentY - 1] = true;
+				}
 
 				c1 = BoardManager.Instance.ChessPieces [CurrentX + 1, CurrentY - 1];
 				if (c1 != null && c1.isWhite)
@@ -65,8 +77,9 @@ public class Pawn : ChessPiece {
 
 			//Diagonal Right
 			if (CurrentX != 0 && CurrentY != 0) {
-				if (enPassant [0] == CurrentX - 1 && enPassant [1] == CurrentY - 1)
+				if (enPassant [0] == CurrentX - 1 && enPassant [1] == CurrentY - 1 && !BoardManager.isWhiteTurn) {
 					possibleMoves [CurrentX - 1, CurrentY - 1] = true;
+				}
 
 				c1 = BoardManager.Instance.ChessPieces [CurrentX - 1, CurrentY - 1];
 				if (c1 != null && c1.isWhite)
