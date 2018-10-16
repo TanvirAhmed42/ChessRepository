@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class Queen : ChessPiece {
 
-	public override bool[,] PossibleMove ()
+	public override void PossibleMove ()
 	{
-		bool[,] possibleMoves = new bool[8, 8];
-		ChessPiece c = null;
+		moves.Clear ();
+		ChessPiece c;
 		int i, j;
-		checkKing = false;
 
 		//Right
 		i = CurrentX;
@@ -19,14 +18,18 @@ public class Queen : ChessPiece {
 				break;
 
 			c = BoardManager.Instance.ChessPieces [i, CurrentY];
-			if (c == null)
-				possibleMoves [i, CurrentY] = true;
-			else {
+			if (c == null) {
+				Move move = new Move (CurrentX, CurrentY, i, CurrentY, isWhite);
+				if (move.isLegalMove) {
+					moves.Add (move);
+				}
+			} else {
 				if (c.isWhite != isWhite) {
-					possibleMoves [i, CurrentY] = true;
-					if (c.GetType () == typeof(King)) {
-						checkKing = true;
+					Move move = new Move (CurrentX, CurrentY, i, CurrentY, isWhite);
+					if (move.isLegalMove) {
+						moves.Add (move);
 					}
+
 				}
 
 				break;
@@ -41,13 +44,16 @@ public class Queen : ChessPiece {
 				break;
 
 			c = BoardManager.Instance.ChessPieces [i, CurrentY];
-			if (c == null)
-				possibleMoves [i, CurrentY] = true;
-			else {
+			if (c == null) {
+				Move move = new Move (CurrentX, CurrentY, i, CurrentY, isWhite);
+				if (move.isLegalMove) {
+					moves.Add (move);
+				}
+			} else {
 				if (c.isWhite != isWhite) {
-					possibleMoves [i, CurrentY] = true;
-					if (c.GetType () == typeof(King)) {
-						checkKing = true;
+					Move move = new Move (CurrentX, CurrentY, i, CurrentY, isWhite);
+					if (move.isLegalMove) {
+						moves.Add (move);
 					}
 				}
 
@@ -63,13 +69,16 @@ public class Queen : ChessPiece {
 				break;
 
 			c = BoardManager.Instance.ChessPieces [CurrentX, i];
-			if (c == null)
-				possibleMoves [CurrentX, i] = true;
-			else {
+			if (c == null) {
+				Move move = new Move (CurrentX, CurrentY, CurrentX, i, isWhite);
+				if (move.isLegalMove) {
+					moves.Add (move);
+				}
+			} else {
 				if (c.isWhite != isWhite) {
-					possibleMoves [CurrentX, i] = true;
-					if (c.GetType () == typeof(King)) {
-						checkKing = true;
+					Move move = new Move (CurrentX, CurrentY, CurrentX, i, isWhite);
+					if (move.isLegalMove) {
+						moves.Add (move);
 					}
 				}
 
@@ -85,13 +94,16 @@ public class Queen : ChessPiece {
 				break;
 
 			c = BoardManager.Instance.ChessPieces [CurrentX, i];
-			if (c == null)
-				possibleMoves [CurrentX, i] = true;
-			else {
+			if (c == null) {
+				Move move = new Move (CurrentX, CurrentY, CurrentX, i, isWhite);
+				if (move.isLegalMove) {
+					moves.Add (move);
+				}
+			} else {
 				if (c.isWhite != isWhite) {
-					possibleMoves [CurrentX, i] = true;
-					if (c.GetType () == typeof(King)) {
-						checkKing = true;
+					Move move = new Move (CurrentX, CurrentY, CurrentX, i, isWhite);
+					if (move.isLegalMove) {
+						moves.Add (move);
 					}
 				}
 
@@ -105,17 +117,21 @@ public class Queen : ChessPiece {
 		while (true) {
 			i++;
 			j++;
-			if (i >= 8 || j >= 8)
+			if (i >= 8 || j >= 8) {
 				break;
+			}
 
 			c = BoardManager.Instance.ChessPieces [i, j];
-			if (c == null)
-				possibleMoves [i, j] = true;
-			else {
+			if (c == null) {
+				Move move = new Move (CurrentX, CurrentY, i, j, isWhite);
+				if (move.isLegalMove) {
+					moves.Add (move);
+				}
+			} else {
 				if (c.isWhite != isWhite) {
-					possibleMoves [i, j] = true;
-					if (c.GetType () == typeof(King)) {
-						checkKing = true;
+					Move move = new Move (CurrentX, CurrentY, i, j, isWhite);
+					if (move.isLegalMove) {
+						moves.Add (move);
 					}
 				}
 
@@ -133,13 +149,16 @@ public class Queen : ChessPiece {
 				break;
 
 			c = BoardManager.Instance.ChessPieces [i, j];
-			if (c == null)
-				possibleMoves [i, j] = true;
-			else {
+			if (c == null) {
+				Move move = new Move (CurrentX, CurrentY, i, j, isWhite);
+				if (move.isLegalMove) {
+					moves.Add (move);
+				}
+			} else {
 				if (c.isWhite != isWhite) {
-					possibleMoves [i, j] = true;
-					if (c.GetType () == typeof(King)) {
-						checkKing = true;
+					Move move = new Move (CurrentX, CurrentY, i, j, isWhite);
+					if (move.isLegalMove) {
+						moves.Add (move);
 					}
 				}
 
@@ -157,13 +176,16 @@ public class Queen : ChessPiece {
 				break;
 
 			c = BoardManager.Instance.ChessPieces [i, j];
-			if (c == null)
-				possibleMoves [i, j] = true;
-			else {
+			if (c == null) {
+				Move move = new Move (CurrentX, CurrentY, i, j, isWhite);
+				if (move.isLegalMove) {
+					moves.Add (move);
+				}
+			} else {
 				if (c.isWhite != isWhite) {
-					possibleMoves [i, j] = true;
-					if (c.GetType () == typeof(King)) {
-						checkKing = true;
+					Move move = new Move (CurrentX, CurrentY, i, j, isWhite);
+					if (move.isLegalMove) {
+						moves.Add (move);
 					}
 				}
 
@@ -181,20 +203,180 @@ public class Queen : ChessPiece {
 				break;
 
 			c = BoardManager.Instance.ChessPieces [i, j];
-			if (c == null)
-				possibleMoves [i, j] = true;
-			else {
+			if (c == null) {
+				Move move = new Move (CurrentX, CurrentY, i, j, isWhite);
+				if (move.isLegalMove) {
+					moves.Add (move);
+				}
+			} else {
 				if (c.isWhite != isWhite) {
-					possibleMoves [i, j] = true;
-					if (c.GetType () == typeof(King)) {
-						checkKing = true;
+					Move move = new Move (CurrentX, CurrentY, i, j, isWhite);
+					if (move.isLegalMove) {
+						moves.Add (move);
 					}
 				}
 
 				break;
 			}
 		}
+	}
 
-		return possibleMoves;
+	public override void CanCheckKing ()
+	{
+		checkKing = false;
+		ChessPiece c;
+		int i, j;
+
+		//Right
+		i = CurrentX;
+		while (true) {
+			i++;
+			if (i >= 8) {
+				break;
+			}
+
+			c = BoardManager.Instance.ChessPieces [i, CurrentY];
+			if (c != null && c.GetType () != typeof(King)) {
+				break;
+			}
+			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
+				checkKing = true;
+				return;
+			}
+		}
+
+		//Left
+		i = CurrentX;
+		while (true) {
+			i--;
+			if (i < 0) {
+				break;
+			}
+
+			c = BoardManager.Instance.ChessPieces [i, CurrentY];
+			if (c != null && c.GetType () != typeof(King)) {
+				break;
+			}
+			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
+				checkKing = true;
+				return;
+			}
+		}
+
+		//Up
+		i = CurrentY;
+		while (true) {
+			i++;
+			if (i >= 8) {
+				break;
+			}
+
+			c = BoardManager.Instance.ChessPieces [CurrentX, i];
+			if (c != null && c.GetType () != typeof(King)) {
+				break;
+			}
+			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
+				checkKing = true;
+				return;
+			}
+		}
+
+		//Down
+		i = CurrentY;
+		while (true) {
+			i--;
+			if (i < 0) {
+				break;
+			}
+
+			c = BoardManager.Instance.ChessPieces [CurrentX, i];
+			if (c != null && c.GetType () != typeof(King)) {
+				break;
+			}
+			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
+				checkKing = true;
+				return;
+			}
+		}
+
+		//Top Right
+		i = CurrentX;
+		j = CurrentY;
+		while (true) {
+			i++;
+			j++;
+			if (i >= 8 || j >= 8) {
+				break;
+			}
+
+			c = BoardManager.Instance.ChessPieces [i, j];
+			if (c != null && c.GetType () != typeof(King)) {
+				break;
+			}
+			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
+				checkKing = true;
+				return;
+			}
+		}
+
+		//Top Left
+		i = CurrentX;
+		j = CurrentY;
+		while (true) {
+			i--;
+			j++;
+			if (i < 0 || j >= 8) {
+				break;
+			}
+
+			c = BoardManager.Instance.ChessPieces [i, j];
+			if (c != null && c.GetType () != typeof(King)) {
+				break;
+			}
+			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
+				checkKing = true;
+				return;
+			}
+		}
+
+		//Bottom right
+		i = CurrentX;
+		j = CurrentY;
+		while (true) {
+			i++;
+			j--;
+			if (i >= 8 || j < 0) {
+				break;
+			}
+
+			c = BoardManager.Instance.ChessPieces [i, j];
+			if (c != null && c.GetType () != typeof(King)) {
+				break;
+			}
+			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
+				checkKing = true;
+				return;
+			}
+		}
+
+		//Bottom Left
+		i = CurrentX;
+		j = CurrentY;
+		while (true) {
+			i--;
+			j--;
+			if (i < 0 || j < 0) {
+				break;
+			}
+
+			c = BoardManager.Instance.ChessPieces [i, j];
+			if (c != null && c.GetType () != typeof(King)) {
+				break;
+			}
+			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
+				checkKing = true;
+				return;
+			}
+		}
 	}
 }

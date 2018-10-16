@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq;
 
 public class BoardManager : MonoBehaviour {
 
@@ -15,17 +16,24 @@ public class BoardManager : MonoBehaviour {
 	#endregion
 
 	public ChessPiece[,] ChessPieces{ get; set; }
-	[HideInInspector]
+	//[HideInInspector]
 	public List<ChessPiece> allWhitePieces;
-	[HideInInspector]
+	//[HideInInspector]
 	public List<ChessPiece> allBlackPieces;
+	//[HideInInspector]
+	public List<Move> allPossibleWhiteMoves = new List<Move> ();
+	//[HideInInspector]
+	public List<Move> allPossibleBlackMoves = new List<Move> ();
 
 	public List<GameObject> chessPiecePrefabs;
+
 
 	public static bool isWhiteTurn = true;
 	public bool isBlackChecked;
 	public bool isWhiteChecked;
 
+	public bool whiteKingHasMoved;
+	public bool blackKingHasMoved;
 	public int[] EnPassant{ get; set; }
 
 	List<GameObject> activeChessPieces;
@@ -42,6 +50,10 @@ public class BoardManager : MonoBehaviour {
 
 	void Start () {
 		SpawnAllChessPieces ();
+		CalculateAllWhiteMoves ();
+		CalculateAllBlackMoves ();
+
+		//selectedChesspiece = ChessPieces [4, 1];
 	}
 
 	void Update () {
@@ -68,21 +80,9 @@ public class BoardManager : MonoBehaviour {
 			return;
 		}
 
-		bool hasAtLeastOneMove = false;
-		AllowedMoves = ChessPieces [x, y].PossibleMove ();
-		for (int i = 0; i < 8; i++) {
-			for (int j = 0; j < 8; j++) {
-				if (AllowedMoves [i, j]) {
-					hasAtLeastOneMove = true;
-					break;
-				}
-			}
-		}
-
-		if (!hasAtLeastOneMove)
-			return;
-
 		selectedChesspiece = ChessPieces [x, y];
+		AllowedMoves = selectedChesspiece.MovesListToBoolArray (selectedChesspiece.moves);
+
 		BoardHighlight.Instance.HighlightAllowedMoves (AllowedMoves);
 	}
 
@@ -96,120 +96,173 @@ public class BoardManager : MonoBehaviour {
 		Destroy (c.gameObject);
 	}
 
+	public void AddPiece (ChessPiece c, int x, int y) {
+		activeChessPieces.Add (c.gameObject);
+		if (c.isWhite) {
+			allWhitePieces.Add (c);
+		} else {
+			allBlackPieces.Add (c);
+		}
+		c.SetPosition (x, y);
+	}
+
+	public void CaptureSimulation (ChessPiece c) {
+		activeChessPieces.Remove (c.gameObject);
+		if (c.isWhite) {
+			allWhitePieces.Remove (c);
+		} else {
+			allBlackPieces.Remove (c);
+		}
+		ChessPieces [c.CurrentX, c.CurrentY] = null;
+	}
+
 	void MoveChessPiece (int x, int y) {
 		if (AllowedMoves [x, y]) {
-			Vector2 lastPosition = new Vector2 (selectedChesspiece.CurrentX, selectedChesspiece.CurrentY);
 			ChessPiece previousPiece = ChessPieces [x, y];
-			bool noCheck = false;
-			MoveInGame (x, y);
-			if (selectedChesspiece.isWhite) {
-				CalculateWhiteCheck ();
-
-				if (isWhiteChecked) {
-					RevertInGame ((int)lastPosition.x, (int)lastPosition.y, x, y, previousPiece);
-				} else {
-					noCheck = true;
-					RevertInGame ((int)lastPosition.x, (int)lastPosition.y, x, y, previousPiece);
-				}
-			} else {
-				CalculateBlackCheck ();
-
-				if (isBlackChecked) {
-					RevertInGame ((int)lastPosition.x, (int)lastPosition.y, x, y, previousPiece);
-				} else {
-					noCheck = true;
-					RevertInGame ((int)lastPosition.x, (int)lastPosition.y, x, y, previousPiece);
-				}
+			if (previousPiece != null && previousPiece.isWhite != isWhiteTurn) {
+				CapturePiece (previousPiece);
 			}
+			if (selectedChesspiece.GetType () == typeof(Pawn)) {
+				if (y == 7) {
+					// White Promotion
+					CapturePiece (selectedChesspiece);
+					SpawnChessPieces (1, x, y);
+					selectedChesspiece = ChessPieces [x, y];
+				} else if (y == 0) {
+					// Black Promotion
+					CapturePiece (selectedChesspiece);
+					SpawnChessPieces (7, x, y);
+					selectedChesspiece = ChessPieces [x, y];
+				}
 
-			if (noCheck) {
-				if (previousPiece != null && previousPiece.isWhite != isWhiteTurn) {
+				if (x == EnPassant [0] && y == EnPassant [1]) {
+					if (y == 5 && isWhiteTurn) {
+						previousPiece = ChessPieces [x, y - 1];
+					} else if (y == 2 && !isWhiteTurn) {
+						previousPiece = ChessPieces [x, y + 1];
+					}
+
 					CapturePiece (previousPiece);
 				}
-				if (selectedChesspiece.GetType () == typeof(Pawn)) {
-					if (y == 7) {
-						// White Promotion
-						CapturePiece (selectedChesspiece);
-						SpawnChessPieces (1, x, y);
-						selectedChesspiece = ChessPieces [x, y];
-					} else if (y == 0) {
-						// Black Promotion
-						CapturePiece (selectedChesspiece);
-						SpawnChessPieces (7, x, y);
-						selectedChesspiece = ChessPieces [x, y];
-					}
-
-					if (x == EnPassant [0] && y == EnPassant [1]) {
-						if (y == 5 && isWhiteTurn) {
-							previousPiece = ChessPieces [x, y - 1];
-						} else if (y == 2 && !isWhiteTurn) {
-							previousPiece = ChessPieces [x, y + 1];
-						}
-
-						CapturePiece (previousPiece);
-					}
-				}
-
-				EnPassant [0] = -1;
-				EnPassant [1] = -1;
-
-				if (selectedChesspiece.GetType () == typeof(Pawn)) {
-					if (selectedChesspiece.CurrentY == 1 && y == 3) {
-						//Black gets Enpassant
-						EnPassant [0] = x;
-						EnPassant [1] = y - 1;
-					} else if (selectedChesspiece.CurrentY == 6 && y == 4) {
-						//Black Gets EnPassant
-						EnPassant [0] = x;
-						EnPassant [1] = y + 1;
-					}
-				}
-
-				MoveInGame (x, y);
-				MovePhysical (x, y);
 			}
+
+			EnPassant [0] = -1;
+			EnPassant [1] = -1;
+
+			if (selectedChesspiece.GetType () == typeof(Pawn)) {
+				if (selectedChesspiece.CurrentY == 1 && y == 3) {
+					//Black gets Enpassant
+					EnPassant [0] = x;
+					EnPassant [1] = y - 1;
+				} else if (selectedChesspiece.CurrentY == 6 && y == 4) {
+					//Black Gets EnPassant
+					EnPassant [0] = x;
+					EnPassant [1] = y + 1;
+				}
+			}
+
+			MoveInGame (x, y, selectedChesspiece);
+			MovePhysical (x, y);
+
+			if (selectedChesspiece.GetType () == typeof(King)) {
+				if (!isWhiteTurn) {
+					if (x == 2 && !whiteKingHasMoved) {
+						ChessPiece rookPiece = ChessPieces [0, 0];
+						MoveInGame (3, 0, rookPiece);
+						rookPiece.transform.position = GetTileCentre (3, 0);
+					} else if (x == 6 && !whiteKingHasMoved) {
+						ChessPiece rookPiece = ChessPieces [7, 0];
+						MoveInGame (5, 0, rookPiece);
+						rookPiece.transform.position = GetTileCentre (5, 0);
+					}
+
+					whiteKingHasMoved = true;
+				} else {
+					if (x == 2 && !blackKingHasMoved) {
+						ChessPiece rookPiece = ChessPieces [0, 7];
+						MoveInGame (3, 7, rookPiece);
+						rookPiece.transform.position = GetTileCentre (3, 7);
+					} else if (x == 6 && !blackKingHasMoved) {
+						ChessPiece rookPiece = ChessPieces [7, 7];
+						MoveInGame (5, 7, rookPiece);
+						rookPiece.transform.position = GetTileCentre (5, 7);
+					}
+
+					blackKingHasMoved = true;
+				}
+			}
+
+			CalculateAllWhiteMoves ();
+			CalculateAllBlackMoves ();
 		}
 
 		BoardHighlight.Instance.HideHighlights ();
 		selectedChesspiece = null;
+
+		if (allPossibleWhiteMoves.Count == 0) {
+			Debug.Log ("Black Won");
+		}
+		if (allPossibleBlackMoves.Count == 0) {
+			Debug.Log ("White Won");
+		}
 	}
 
-	void MoveInGame (int x, int y) {
-		ChessPieces [selectedChesspiece.CurrentX, selectedChesspiece.CurrentY] = null;
-		selectedChesspiece.SetPosition (x, y);
-		ChessPieces [x, y] = selectedChesspiece;
+	public void MoveInGame (int x, int y, ChessPiece pieceToMove) {
+		ChessPieces [pieceToMove.CurrentX, pieceToMove.CurrentY] = null;
+		pieceToMove.SetPosition (x, y);
+		ChessPieces [x, y] = pieceToMove;
 	}
 
-	void MovePhysical (int x, int y) {
+	public void MovePhysical (int x, int y) {
 		selectedChesspiece.transform.position = GetTileCentre (x, y);
 		isWhiteTurn = !isWhiteTurn;
 	}
 
-	void RevertInGame (int lastX, int lastY, int x, int y, ChessPiece previousPiece) {
-		ChessPieces [lastX, lastY] = selectedChesspiece;
-		selectedChesspiece.SetPosition (lastX, lastY);
+	public void RevertInGame (int lastX, int lastY, int x, int y, ChessPiece previousPiece, ChessPiece pieceToRevert) {
+		ChessPieces [lastX, lastY] = pieceToRevert;
+		pieceToRevert.SetPosition (lastX, lastY);
 		ChessPieces [x, y] = previousPiece;
 	}
 
-	void CalculateBlackCheck () {
+	public bool CalculateBlackCheck () {
 		isBlackChecked = false;
 		foreach (ChessPiece c in allWhitePieces) {
-			c.PossibleMove ();
+			c.CanCheckKing ();
 			if (c.checkKing) {
 				isBlackChecked = true;
 				break;
 			}
 		}
+
+		return isBlackChecked;
 	}
 
-	void CalculateWhiteCheck () {
+	public bool CalculateWhiteCheck () {
 		isWhiteChecked = false;
 		foreach (ChessPiece c in allBlackPieces) {
-			c.PossibleMove ();
+			c.CanCheckKing ();
 			if (c.checkKing) {
 				isWhiteChecked = true;
 				break;
 			}
+		}
+
+		return isWhiteChecked;
+	}
+
+	void CalculateAllWhiteMoves () {
+		allPossibleWhiteMoves.Clear ();
+		foreach (ChessPiece whitePiece in allWhitePieces) {
+			whitePiece.PossibleMove ();
+			allPossibleWhiteMoves.AddRange (whitePiece.moves);
+		}
+	}
+
+	void CalculateAllBlackMoves () {
+		allPossibleBlackMoves.Clear ();
+		foreach (ChessPiece blackPiece in allBlackPieces) {
+			blackPiece.PossibleMove ();
+			allPossibleBlackMoves.AddRange (blackPiece.moves);
 		}
 	}
 

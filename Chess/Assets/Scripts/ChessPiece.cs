@@ -8,13 +8,34 @@ public abstract class ChessPiece : MonoBehaviour {
 	public int CurrentY{ get; set; }
 	public bool isWhite;
 	public bool checkKing;
+	public List<Move> moves;
 
 	public void SetPosition (int x, int y) {
 		CurrentX = x;
 		CurrentY = y;
 	}
 
-	public virtual bool[,] PossibleMove () {
-		return new bool[8, 8];
+	public virtual void PossibleMove () {
+		return;
+	}
+
+	public bool[,] MovesListToBoolArray (List<Move> moves) {
+		bool[,] possibleMoves = new bool[8, 8];
+		foreach (Move move in moves) {
+			int targetX = move.targetX;
+			int targetY = move.targetY;
+
+			possibleMoves [targetX, targetY] = true;
+		}
+
+		return possibleMoves;
+	}
+
+	public void AddMove (Move move) {
+		moves.Add (move);
+	}
+
+	public virtual void CanCheckKing () {
+		return;
 	}
 }

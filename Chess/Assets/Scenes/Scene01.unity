@@ -446,6 +446,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ff6f44c49935654bb60f2d7d90b9712, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  allWhitePieces: []
+  allBlackPieces: []
+  allPossibleWhiteMoves: []
+  allPossibleBlackMoves: []
   chessPiecePrefabs:
   - {fileID: 1995290720284760, guid: 577509557e1de1342809bbf486ddb98e, type: 2}
   - {fileID: 1241708638176682, guid: 22e6b9d352949c84391b5e43478330e9, type: 2}
@@ -459,7 +463,8 @@ MonoBehaviour:
   - {fileID: 1728646492397340, guid: ed97d5469d10fde47838f389cf0051ac, type: 2}
   - {fileID: 1058441159790666, guid: 74836b6e7e00a7e43b5c4133e7c6e809, type: 2}
   - {fileID: 1837924897374072, guid: 1c47a9dd6e7162b42b4a4a664476027f, type: 2}
-  isWhiteTurn: 1
+  isBlackChecked: 0
+  isWhiteChecked: 0
 --- !u!4 &2108113245
 Transform:
   m_ObjectHideFlags: 0
