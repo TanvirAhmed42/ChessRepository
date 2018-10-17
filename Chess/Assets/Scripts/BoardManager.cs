@@ -28,7 +28,7 @@ public class BoardManager : MonoBehaviour {
 	public List<GameObject> chessPiecePrefabs;
 
 
-	public static bool isWhiteTurn = true;
+	public bool isWhiteTurn = true;
 	public bool isBlackChecked;
 	public bool isWhiteChecked;
 
@@ -51,7 +51,6 @@ public class BoardManager : MonoBehaviour {
 	void Start () {
 		SpawnAllChessPieces ();
 		CalculateAllWhiteMoves ();
-		CalculateAllBlackMoves ();
 
 		//selectedChesspiece = ChessPieces [4, 1];
 	}
@@ -125,8 +124,11 @@ public class BoardManager : MonoBehaviour {
 			if (selectedChesspiece.GetType () == typeof(Pawn)) {
 				if (y == 7) {
 					// White Promotion
+					//Debug.Log(ChessPieces[x, y] + " Before Promotion starts");
 					CapturePiece (selectedChesspiece);
+					//Debug.Log (ChessPieces [x, y] + " After Capture Before Spawning");
 					SpawnChessPieces (1, x, y);
+					//Debug.Log (ChessPieces [x, y] + " After Spawning");
 					selectedChesspiece = ChessPieces [x, y];
 				} else if (y == 0) {
 					// Black Promotion
@@ -192,19 +194,35 @@ public class BoardManager : MonoBehaviour {
 				}
 			}
 
-			CalculateAllWhiteMoves ();
-			CalculateAllBlackMoves ();
+			if (isWhiteTurn) {
+				CalculateAllWhiteMoves ();
+			} else {
+				CalculateAllBlackMoves ();
+			}
+
+			if (isWhiteTurn) {
+				isBlackChecked = false;
+			} else {
+				isWhiteChecked = false;
+			}
+
+			if (allPossibleWhiteMoves.Count == 0) {
+				if (CalculateWhiteCheck ()) {
+					Debug.Log ("Black Won");
+				} else {
+					Debug.Log ("Match Draw");
+				}
+			} else if (allPossibleBlackMoves.Count == 0) {
+				if (CalculateBlackCheck ()) {
+					Debug.Log ("White Won");
+				} else {
+					Debug.Log ("Match Draw");
+				}
+			}
 		}
 
 		BoardHighlight.Instance.HideHighlights ();
 		selectedChesspiece = null;
-
-		if (allPossibleWhiteMoves.Count == 0) {
-			Debug.Log ("Black Won");
-		}
-		if (allPossibleBlackMoves.Count == 0) {
-			Debug.Log ("White Won");
-		}
 	}
 
 	public void MoveInGame (int x, int y, ChessPiece pieceToMove) {
@@ -230,6 +248,7 @@ public class BoardManager : MonoBehaviour {
 			c.CanCheckKing ();
 			if (c.checkKing) {
 				isBlackChecked = true;
+				//Debug.Log (c);
 				break;
 			}
 		}
@@ -250,7 +269,7 @@ public class BoardManager : MonoBehaviour {
 		return isWhiteChecked;
 	}
 
-	void CalculateAllWhiteMoves () {
+	public void CalculateAllWhiteMoves () {
 		allPossibleWhiteMoves.Clear ();
 		foreach (ChessPiece whitePiece in allWhitePieces) {
 			whitePiece.PossibleMove ();
@@ -258,7 +277,7 @@ public class BoardManager : MonoBehaviour {
 		}
 	}
 
-	void CalculateAllBlackMoves () {
+	public void CalculateAllBlackMoves () {
 		allPossibleBlackMoves.Clear ();
 		foreach (ChessPiece blackPiece in allBlackPieces) {
 			blackPiece.PossibleMove ();
@@ -287,6 +306,7 @@ public class BoardManager : MonoBehaviour {
 	void SpawnChessPieces (int index, int x, int y) {
 		GameObject chessPieceToSpawn = Instantiate (chessPiecePrefabs [index], GetTileCentre (x, y), Quaternion.Euler (Vector3.right * 90)) as GameObject;
 		chessPieceToSpawn.transform.SetParent (transform);
+		//Debug.Log (ChessPieces [x, y] + " Before setting to queen");
 		ChessPieces [x, y] = chessPieceToSpawn.GetComponent<ChessPiece> ();
 		ChessPieces [x, y].SetPosition (x, y);
 		activeChessPieces.Add (chessPieceToSpawn);
