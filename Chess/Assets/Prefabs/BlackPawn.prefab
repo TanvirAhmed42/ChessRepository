@@ -53,6 +53,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isWhite: 0
+  checkKing: 0
+  pieceValue: 1
+  moves: []
 --- !u!212 &212398141839432452
 SpriteRenderer:
   m_ObjectHideFlags: 1

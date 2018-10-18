@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Linq;
 
 public class BoardManager : MonoBehaviour {
 
@@ -51,22 +50,24 @@ public class BoardManager : MonoBehaviour {
 	void Start () {
 		SpawnAllChessPieces ();
 		CalculateAllWhiteMoves ();
-
-		//selectedChesspiece = ChessPieces [4, 1];
 	}
 
 	void Update () {
 		UpdateSelection ();
 		DrawChessBoard ();
 
-		if (Input.GetMouseButtonDown (0)) {
-			if (selectionX >= 0 && selectionY >= 0) {
-				if (selectedChesspiece == null) {
-					SelectChessPiece (selectionX, selectionY);
-				} else {
-					MoveChessPiece (selectionX, selectionY);
+		if (isWhiteTurn) {
+			if (Input.GetMouseButtonDown (0)) {
+				if (selectionX >= 0 && selectionY >= 0) {
+					if (selectedChesspiece == null) {
+						SelectChessPiece (selectionX, selectionY);
+					} else {
+						MoveChessPiece (selectionX, selectionY);
+					}
 				}
 			}
+		} else {
+			MoveChessPieceByAI ();
 		}
 	}
 
@@ -115,6 +116,23 @@ public class BoardManager : MonoBehaviour {
 		ChessPieces [c.CurrentX, c.CurrentY] = null;
 	}
 
+	void MoveChessPieceByAI () {
+		Move[] bestMoves = ChessAI.Instance.CalculateBlackBestMove (allPossibleBlackMoves.ToArray ());
+		if (bestMoves.Length == 0) {
+			if (CalculateBlackCheck ()) {
+				Debug.Log ("You Win");
+			} else {
+				Debug.Log ("Match Draw");
+			}
+			return;
+		}
+		int randomBestMove = Random.Range (0, bestMoves.Length);
+		selectedChesspiece = bestMoves [randomBestMove].pieceToMove;
+		AllowedMoves = selectedChesspiece.MovesListToBoolArray (selectedChesspiece.moves);
+		MoveChessPiece (bestMoves [randomBestMove].targetX, bestMoves [randomBestMove].targetY);
+
+	}
+
 	void MoveChessPiece (int x, int y) {
 		if (AllowedMoves [x, y]) {
 			ChessPiece previousPiece = ChessPieces [x, y];
@@ -124,17 +142,16 @@ public class BoardManager : MonoBehaviour {
 			if (selectedChesspiece.GetType () == typeof(Pawn)) {
 				if (y == 7) {
 					// White Promotion
-					//Debug.Log(ChessPieces[x, y] + " Before Promotion starts");
 					CapturePiece (selectedChesspiece);
-					//Debug.Log (ChessPieces [x, y] + " After Capture Before Spawning");
 					SpawnChessPieces (1, x, y);
-					//Debug.Log (ChessPieces [x, y] + " After Spawning");
 					selectedChesspiece = ChessPieces [x, y];
+					selectedChesspiece.PossibleMove ();
 				} else if (y == 0) {
 					// Black Promotion
 					CapturePiece (selectedChesspiece);
 					SpawnChessPieces (7, x, y);
 					selectedChesspiece = ChessPieces [x, y];
+					selectedChesspiece.PossibleMove ();
 				}
 
 				if (x == EnPassant [0] && y == EnPassant [1]) {
@@ -245,11 +262,13 @@ public class BoardManager : MonoBehaviour {
 	public bool CalculateBlackCheck () {
 		isBlackChecked = false;
 		foreach (ChessPiece c in allWhitePieces) {
-			c.CanCheckKing ();
-			if (c.checkKing) {
-				isBlackChecked = true;
-				//Debug.Log (c);
-				break;
+			if (c != null) {
+				c.CanCheckKing ();
+				if (c.checkKing) {
+					isBlackChecked = true;
+					//Debug.Log (c);
+					break;
+				}
 			}
 		}
 
@@ -259,10 +278,12 @@ public class BoardManager : MonoBehaviour {
 	public bool CalculateWhiteCheck () {
 		isWhiteChecked = false;
 		foreach (ChessPiece c in allBlackPieces) {
-			c.CanCheckKing ();
-			if (c.checkKing) {
-				isWhiteChecked = true;
-				break;
+			if (c != null) {
+				c.CanCheckKing ();
+				if (c.checkKing) {
+					isWhiteChecked = true;
+					break;
+				}
 			}
 		}
 

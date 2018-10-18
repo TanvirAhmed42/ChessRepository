@@ -42,4 +42,11 @@ public class Move {
 			BoardManager.Instance.AddPiece (targetPiece, targetX, targetY);
 		}
 	}
+
+	public void PrintMove () {
+		char currectXChar = (char)(currentX + 48);
+		char targetXChar = (char)(targetX + 48);
+
+		Debug.Log (currectXChar.ToString () + currentY + " to " + targetXChar.ToString () + targetY);
+	}
 }

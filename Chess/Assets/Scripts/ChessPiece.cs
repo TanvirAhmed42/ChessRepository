@@ -8,6 +8,7 @@ public abstract class ChessPiece : MonoBehaviour {
 	public int CurrentY{ get; set; }
 	public bool isWhite;
 	public bool checkKing;
+	public int pieceValue;
 	public List<Move> moves;
 
 	public void SetPosition (int x, int y) {
