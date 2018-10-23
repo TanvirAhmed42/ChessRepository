@@ -28,6 +28,7 @@ public class BoardManager : MonoBehaviour {
 
 
 	public bool isWhiteTurn = true;
+	public bool twoPlayer = true;
 	public bool isBlackChecked;
 	public bool isWhiteChecked;
 
@@ -56,7 +57,21 @@ public class BoardManager : MonoBehaviour {
 		UpdateSelection ();
 		DrawChessBoard ();
 
-		if (isWhiteTurn) {
+		if (!twoPlayer) {
+			if (isWhiteTurn) {
+				if (Input.GetMouseButtonDown (0)) {
+					if (selectionX >= 0 && selectionY >= 0) {
+						if (selectedChesspiece == null) {
+							SelectChessPiece (selectionX, selectionY);
+						} else {
+							MoveChessPiece (selectionX, selectionY);
+						}
+					}
+				}
+			} else {
+				MoveChessPieceByAI ();
+			}
+		} else {
 			if (Input.GetMouseButtonDown (0)) {
 				if (selectionX >= 0 && selectionY >= 0) {
 					if (selectedChesspiece == null) {
@@ -66,8 +81,6 @@ public class BoardManager : MonoBehaviour {
 					}
 				}
 			}
-		} else {
-			MoveChessPieceByAI ();
 		}
 	}
 
