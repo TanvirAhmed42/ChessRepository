@@ -13,7 +13,7 @@ public class King : ChessPiece {
 		ChessPiece c1, c2, c3, c4, c5, c6, c7;
 		//White Castling
 		if (isWhite) {
-			if (!BoardManager.Instance.whiteKingHasMoved && !BoardManager.Instance.isWhiteChecked) {
+			if (!BoardManager.Instance.whiteKingHasMoved && !BoardManager.Instance.CalculateWhiteCheck ()) {
 				c1 = BoardManager.Instance.ChessPieces [0, 0];
 				c2 = BoardManager.Instance.ChessPieces [1, 0];
 				c3 = BoardManager.Instance.ChessPieces [2, 0];
@@ -72,7 +72,7 @@ public class King : ChessPiece {
 				}
 			}
 		} else {
-			if (!BoardManager.Instance.blackKingHasMoved && !BoardManager.Instance.isBlackChecked) {
+			if (!BoardManager.Instance.blackKingHasMoved && !BoardManager.Instance.CalculateBlackCheck ()) {
 				c1 = BoardManager.Instance.ChessPieces [0, 7];
 				c2 = BoardManager.Instance.ChessPieces [1, 7];
 				c3 = BoardManager.Instance.ChessPieces [2, 7];

@@ -24,22 +24,39 @@ public class ChessAI : MonoBehaviour {
 		List<Evaluation> evaluations = new List<Evaluation> ();
 
 		int minState = int.MaxValue;
-		foreach (Move move in allPossibleBlackMoves) {
-			ChessPiece pieceToMove = move.pieceToMove;
-			ChessPiece targetPiece = move.targetPiece;
-			if (targetPiece != null) {
-				boardManager.CaptureSimulation (targetPiece);
+		foreach (Move blackMove in allPossibleBlackMoves) {
+			ChessPiece blackPieceToMove = blackMove.pieceToMove;
+			ChessPiece blackTargetPiece = blackMove.targetPiece;
+			if (blackTargetPiece != null) {
+				boardManager.CaptureSimulation (blackTargetPiece);
 			}
-			boardManager.MoveInGame (move.targetX, move.targetY, pieceToMove);
-			int currentState = CalculateGameState (boardManager.allWhitePieces.ToArray (), boardManager.allBlackPieces.ToArray ());
-			Evaluation e = new Evaluation (move, currentState);
+			boardManager.MoveInGame (blackMove.targetX, blackMove.targetY, blackPieceToMove);
+			boardManager.CalculateAllWhiteMoves ();
+			int maxState = int.MinValue;
+			foreach (Move whiteMove in boardManager.allPossibleWhiteMoves) {
+				ChessPiece whitePieceToMove = whiteMove.pieceToMove;
+				ChessPiece whiteTargetPiece = whiteMove.targetPiece;
+				if (whiteTargetPiece != null) {
+					boardManager.CaptureSimulation (whiteTargetPiece);
+				}
+				boardManager.MoveInGame (whiteMove.targetX, whiteMove.targetY, whitePieceToMove);
+				int currentState = CalculateGameState (boardManager.allWhitePieces.ToArray (), boardManager.allBlackPieces.ToArray ());
+				if (currentState > maxState) {
+					maxState = currentState;
+				}
+				boardManager.RevertInGame (whiteMove.currentX, whiteMove.currentY, whiteMove.targetX, whiteMove.targetY, whiteTargetPiece, whitePieceToMove);
+				if (whiteTargetPiece != null) {
+					boardManager.AddPiece (whiteTargetPiece, whiteMove.targetX, whiteMove.targetY);
+				}
+			}
+			Evaluation e = new Evaluation (blackMove, maxState);
 			evaluations.Add (e);
-			if (currentState < minState) {
-				minState = currentState;
+			if (maxState < minState) {
+				minState = maxState;
 			}
-			boardManager.RevertInGame (move.currentX, move.currentY, move.targetX, move.targetY, targetPiece, pieceToMove);
-			if (targetPiece != null) {
-				boardManager.AddPiece (targetPiece, move.targetX, move.targetY);
+			boardManager.RevertInGame (blackMove.currentX, blackMove.currentY, blackMove.targetX, blackMove.targetY, blackTargetPiece, blackPieceToMove);
+			if (blackTargetPiece != null) {
+				boardManager.AddPiece (blackTargetPiece, blackMove.targetX, blackMove.targetY);
 			}
 		}
 
@@ -51,8 +68,6 @@ public class ChessAI : MonoBehaviour {
 		}
 
 		return bestMoves.ToArray ();
-
-
 	}
 
 	int CalculateGameState (ChessPiece[] allWhitePieces, ChessPiece[] allBlackPieces) {

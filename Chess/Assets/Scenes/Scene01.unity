@@ -464,6 +464,8 @@ MonoBehaviour:
   - {fileID: 1728646492397340, guid: ed97d5469d10fde47838f389cf0051ac, type: 2}
   - {fileID: 1058441159790666, guid: 74836b6e7e00a7e43b5c4133e7c6e809, type: 2}
   - {fileID: 1837924897374072, guid: 1c47a9dd6e7162b42b4a4a664476027f, type: 2}
+  isWhiteTurn: 1
+  twoPlayer: 1
   isBlackChecked: 0
   isWhiteChecked: 0
   whiteKingHasMoved: 0
