@@ -41,6 +41,7 @@ public class BoardManager : MonoBehaviour {
 	ChessPiece selectedChesspiece;
 
 	bool[,] AllowedMoves{ set; get; }
+	bool aiMoving;
 
 	const float tile_Size = 1f;
 	const float tile_Offset = .5f;
@@ -59,6 +60,7 @@ public class BoardManager : MonoBehaviour {
 
 		if (!twoPlayer) {
 			if (isWhiteTurn) {
+				aiMoving = false;
 				if (Input.GetMouseButtonDown (0)) {
 					if (selectionX >= 0 && selectionY >= 0) {
 						if (selectedChesspiece == null) {
@@ -69,7 +71,9 @@ public class BoardManager : MonoBehaviour {
 					}
 				}
 			} else {
-				MoveChessPieceByAI ();
+				if (!aiMoving) {
+					MoveChessPieceByAI ();
+				}
 			}
 		} else {
 			if (Input.GetMouseButtonDown (0)) {
@@ -130,7 +134,8 @@ public class BoardManager : MonoBehaviour {
 	}
 
 	void MoveChessPieceByAI () {
-		Move[] bestMoves = ChessAI.Instance.CalculateBlackBestMove (allPossibleBlackMoves.ToArray ());
+		aiMoving = true;
+		Move[] bestMoves = ChessAI.Instance.CalculateBlackBestMove ();
 		if (bestMoves.Length == 0) {
 			if (CalculateBlackCheck ()) {
 				Debug.Log ("You Win");
@@ -139,18 +144,24 @@ public class BoardManager : MonoBehaviour {
 			}
 			return;
 		}
-		int randomBestMove = Random.Range (0, bestMoves.Length);
+		int randomBestMove;
+		if (bestMoves.Length == 1) {
+			randomBestMove = 0;
+		} else {
+			randomBestMove = Random.Range (0, bestMoves.Length);
+		}
+		bestMoves [randomBestMove].PrintMove ();
 		selectedChesspiece = bestMoves [randomBestMove].pieceToMove;
 		AllowedMoves = selectedChesspiece.MovesListToBoolArray (selectedChesspiece.moves);
 		MoveChessPiece (bestMoves [randomBestMove].targetX, bestMoves [randomBestMove].targetY);
-
 	}
 
 	void MoveChessPiece (int x, int y) {
-		if (AllowedMoves [x, y]) {
+		if (AllowedMoves [x, y] || (!isWhiteTurn && !twoPlayer)) {
 			ChessPiece previousPiece = ChessPieces [x, y];
 			if (previousPiece != null && previousPiece.isWhite != isWhiteTurn) {
 				CapturePiece (previousPiece);
+				Debug.Log ("After Capturing");
 			}
 			if (selectedChesspiece.GetType () == typeof(Pawn)) {
 				if (y == 7) {
@@ -193,8 +204,12 @@ public class BoardManager : MonoBehaviour {
 				}
 			}
 
+			Debug.Log ("Before Moving In Game");
 			MoveInGame (x, y, selectedChesspiece);
+			Debug.Log ("After In Game Before Physical");
 			MovePhysical (x, y);
+
+			Debug.Log ("Moved ChessPiece Physically");
 
 			if (selectedChesspiece.GetType () == typeof(King)) {
 				if (!isWhiteTurn) {
@@ -306,16 +321,46 @@ public class BoardManager : MonoBehaviour {
 	public void CalculateAllWhiteMoves () {
 		allPossibleWhiteMoves.Clear ();
 		foreach (ChessPiece whitePiece in allWhitePieces) {
-			whitePiece.PossibleMove ();
-			allPossibleWhiteMoves.AddRange (whitePiece.moves);
+			if (whitePiece != null) {
+				whitePiece.PossibleMove ();
+				allPossibleWhiteMoves.AddRange (whitePiece.moves);
+			}
 		}
+	}
+
+	public Move[] CalculateNextWhiteMoves () {
+		List<Move> whiteMoves = new List<Move> ();
+		for (int i = allWhitePieces.Count - 1; i >= 0; i--) {
+			if (allWhitePieces [i] != null) {
+				allWhitePieces [i].PossibleMove ();
+				//Move[] whitePieceMoves = allWhitePieces [i].CopyMoveList ();
+				whiteMoves.AddRange (allWhitePieces[i].moves);
+			}
+		}
+
+		return whiteMoves.ToArray ();
+	}
+
+	public Move[] CalculateNextBlackMoves () {
+		List<Move> blackMoves = new List<Move> ();
+		for (int i = allBlackPieces.Count - 1; i >= 0; i--) {
+			if (allBlackPieces [i] != null) {
+				allBlackPieces [i].PossibleMove ();
+				//Move[] blackPieceMoves = allBlackPieces [i].CopyMoveList ();
+				blackMoves.AddRange (allBlackPieces[i].moves);
+			}
+		}
+
+		return blackMoves.ToArray ();
 	}
 
 	public void CalculateAllBlackMoves () {
 		allPossibleBlackMoves.Clear ();
 		foreach (ChessPiece blackPiece in allBlackPieces) {
-			blackPiece.PossibleMove ();
-			allPossibleBlackMoves.AddRange (blackPiece.moves);
+			if (blackPiece != null) {
+				blackPiece.PossibleMove ();
+				allPossibleBlackMoves.AddRange (blackPiece.moves);
+			}
 		}
 	}
 

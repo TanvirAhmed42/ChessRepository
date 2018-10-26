@@ -10,6 +10,7 @@ public abstract class ChessPiece : MonoBehaviour {
 	public bool checkKing;
 	public int pieceValue;
 	public List<Move> moves;
+	public Move[] movesArray;
 
 	public void SetPosition (int x, int y) {
 		CurrentX = x;
@@ -32,8 +33,14 @@ public abstract class ChessPiece : MonoBehaviour {
 		return possibleMoves;
 	}
 
-	public void AddMove (Move move) {
-		moves.Add (move);
+	public Move[] CopyMoveList () {
+		movesArray = new Move[moves.Count];
+
+		for (int i = moves.Count - 1; i >= 0; i--) {
+			movesArray [i] = moves [i];
+		}
+
+		return movesArray;
 	}
 
 	public virtual void CanCheckKing () {

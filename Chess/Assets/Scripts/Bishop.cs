@@ -137,7 +137,7 @@ public class Bishop : ChessPiece {
 			}
 
 			c = BoardManager.Instance.ChessPieces [i, j];
-			if (c != null && c.GetType () != typeof(King)) {
+			if (c != null && (c.GetType () != typeof(King) || c.isWhite == isWhite)) {
 				break;
 			}
 			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
@@ -157,7 +157,7 @@ public class Bishop : ChessPiece {
 			}
 
 			c = BoardManager.Instance.ChessPieces [i, j];
-			if (c != null && c.GetType () != typeof(King)) {
+			if (c != null && (c.GetType () != typeof(King) || c.isWhite == isWhite)) {
 				break;
 			}
 			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
@@ -177,7 +177,7 @@ public class Bishop : ChessPiece {
 			}
 
 			c = BoardManager.Instance.ChessPieces [i, j];
-			if (c != null && c.GetType () != typeof(King)) {
+			if (c != null && (c.GetType () != typeof(King) || c.isWhite == isWhite)) {
 				break;
 			}
 			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
@@ -197,7 +197,7 @@ public class Bishop : ChessPiece {
 			}
 
 			c = BoardManager.Instance.ChessPieces [i, j];
-			if (c != null && c.GetType () != typeof(King)) {
+			if (c != null && (c.GetType () != typeof(King) || c.isWhite == isWhite)) {
 				break;
 			}
 			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {

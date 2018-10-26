@@ -127,7 +127,7 @@ public class Rook : ChessPiece {
 			}
 
 			c = BoardManager.Instance.ChessPieces [i, CurrentY];
-			if (c != null && c.GetType () != typeof(King)) {
+			if (c != null && (c.GetType () != typeof(King) || c.isWhite == isWhite)) {
 				break;
 			}
 			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
@@ -145,7 +145,7 @@ public class Rook : ChessPiece {
 			}
 
 			c = BoardManager.Instance.ChessPieces [i, CurrentY];
-			if (c != null && c.GetType () != typeof(King)) {
+			if (c != null && (c.GetType () != typeof(King) || c.isWhite == isWhite)) {
 				break;
 			}
 			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
@@ -163,7 +163,7 @@ public class Rook : ChessPiece {
 			}
 
 			c = BoardManager.Instance.ChessPieces [CurrentX, i];
-			if (c != null && c.GetType () != typeof(King)) {
+			if (c != null && (c.GetType () != typeof(King) || c.isWhite == isWhite)) {
 				break;
 			}
 			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
@@ -181,7 +181,7 @@ public class Rook : ChessPiece {
 			}
 
 			c = BoardManager.Instance.ChessPieces [CurrentX, i];
-			if (c != null && c.GetType () != typeof(King)) {
+			if (c != null && (c.GetType () != typeof(King) || c.isWhite == isWhite)) {
 				break;
 			}
 			if (c != null && c.GetType () == typeof(King) && c.isWhite != isWhite) {
